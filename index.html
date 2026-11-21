@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevDocs — база знаний и онбординг разработчиков</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+[hidden]{display:none!important}
+:root{
+  --bg:#070b16;--bg2:#0a1020;
+  --surface:rgba(15,23,42,.78);--surface2:rgba(22,32,58,.6);
+  --line:rgba(122,140,255,.16);--line2:rgba(122,140,255,.34);
+  --text:#e8ecf8;--muted:#93a0bd;
+  --blue:#4f7cff;--cyan:#22d3ee;--violet:#8b5cf6;--magenta:#e879f9;
+  --green:#34d399;--amber:#fbbf24;--red:#f87171;
+  --mono:'Cascadia Code','JetBrains Mono',Consolas,'Courier New',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:24px;font-size:14px;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--blue),var(--cyan));border-radius:6px;border:2px solid var(--bg2)}
+::-webkit-scrollbar-thumb:hover{background:var(--cyan)}
+::selection{background:rgba(79,124,255,.4)}
+.bg-aurora{position:fixed;inset:0;z-index:-2;background:
+  radial-gradient(900px 600px at 8% -10%,rgba(79,124,255,.22),transparent 60%),
+  radial-gradient(800px 600px at 96% 0%,rgba(139,92,246,.20),transparent 60%),
+  radial-gradient(1000px 700px at 50% 115%,rgba(34,211,238,.12),transparent 60%),
+  linear-gradient(180deg,#070b16,#0a1020)}
+.bg-grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;background-image:radial-gradient(rgba(148,163,255,.07) 1px,transparent 1px);background-size:26px 26px}
+
+.container{width:100%;max-width:1200px;margin:0 auto;padding:24px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px;position:relative;z-index:1}
+.screen{grid-column:1/-1;display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-content:start}
+.m3{grid-column:span 3}.m4{grid-column:span 4}.m6{grid-column:span 6}.m8{grid-column:span 8}.m12{grid-column:1/-1}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.screen>*{animation:rise .45s cubic-bezier(.2,.7,.2,1) both}
+.screen>*:nth-child(2){animation-delay:.05s}.screen>*:nth-child(3){animation-delay:.1s}
+.screen>*:nth-child(4){animation-delay:.15s}.screen>*:nth-child(5){animation-delay:.2s}.screen>*:nth-child(6){animation-delay:.25s}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px;backdrop-filter:blur(10px);transition:border-color .2s,transform .2s,box-shadow .2s}
+.card:hover{border-color:var(--line2)}
+.head{grid-column:1/-1;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.head h2{font-size:22px;line-height:24px;font-weight:700}
+.head .sub{color:var(--muted);font-size:13px}
+header.bar{grid-column:1/-1;min-height:96px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(120deg,rgba(29,78,216,.35),rgba(124,58,237,.3));border:1px solid var(--line2);border-radius:12px;padding:24px}
+.logo{font-size:24px;font-weight:800;display:flex;align-items:center;gap:10px}
+.logo b{background:linear-gradient(90deg,var(--cyan),var(--blue),var(--magenta));-webkit-background-clip:text;background-clip:text;color:transparent}
+.badge-pro{background:linear-gradient(90deg,var(--blue),var(--violet));color:#fff;font:700 10px var(--mono);padding:3px 8px;border-radius:6px;letter-spacing:1px}
+.who{text-align:right}.who b{display:block;font-size:14px}.who span{color:var(--muted);font-size:12px}
+nav.bar{grid-column:1/-1;min-height:48px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:rgba(10,16,32,.9);border:1px solid var(--line);border-radius:10px;padding:8px;position:sticky;top:12px;z-index:60;backdrop-filter:blur(12px)}
+nav.bar button{border:1px solid transparent;background:transparent;color:var(--muted);font:600 13px var(--sans);padding:8px 14px;border-radius:8px;cursor:pointer;transition:.2s}
+nav.bar button:hover{color:var(--text);background:rgba(122,140,255,.1)}
+nav.bar button.on{color:#fff;background:linear-gradient(90deg,var(--blue),var(--violet));box-shadow:0 4px 16px rgba(79,124,255,.35)}
+nav.bar .pill{margin-left:auto;font:600 11px var(--mono);color:var(--cyan);border:1px solid var(--line2);padding:5px 10px;border-radius:20px}
+footer.bar{grid-column:1/-1;min-height:72px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;border-top:1px solid var(--line);text-align:center}
+
+.btn{border:1px solid var(--line2);background:rgba(122,140,255,.08);color:var(--text);font:600 13px var(--sans);padding:10px 16px;border-radius:9px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.btn-p{background:linear-gradient(90deg,var(--blue),var(--cyan));border:none;color:#fff}
+.btn-p:hover{color:#fff;box-shadow:0 6px 20px rgba(34,211,238,.35)}
+.btn-g{background:linear-gradient(90deg,#059669,var(--green));border:none;color:#04211a}
+.btn-g:hover{color:#04211a;box-shadow:0 6px 20px rgba(52,211,153,.35)}
+.btn-a{background:rgba(251,191,36,.14);border-color:rgba(251,191,36,.45);color:var(--amber)}
+.btn-a:hover{color:var(--amber);border-color:var(--amber)}
+.btn-r{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.4);color:var(--red)}
+.btn-r:hover{color:var(--red);border-color:var(--red)}
+.btn-s{padding:6px 12px;font-size:12px}
+.btn.ready{animation:readyGlow 1.6s ease-in-out infinite}
+@keyframes readyGlow{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,.45)}50%{box-shadow:0 0 0 9px rgba(52,211,153,0)}}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mt{margin-top:16px}.mt-s{margin-top:8px}.muted{color:var(--muted)}.mono{font-family:var(--mono)}
+.sep{height:1px;background:var(--line);margin:16px 0}
+
+.feature{background:linear-gradient(135deg,#1d4ed8 0%,#7c3aed 55%,#c026d3 100%);border:none;color:#fff;min-height:288px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 12px 40px rgba(124,58,237,.35);position:relative;overflow:hidden}
+.feature::after{content:'';position:absolute;inset:0;background:radial-gradient(400px 200px at 85% 0%,rgba(255,255,255,.18),transparent 60%);pointer-events:none}
+.feature h3{font-size:13px;text-transform:uppercase;letter-spacing:1px;opacity:.85}
+.feature .big{font-size:24px;line-height:32px;font-weight:800;margin:12px 0}
+.feature p{opacity:.9;font-size:13px}
+.feature .meta{display:flex;gap:16px;align-items:center;font-size:12px;opacity:.9;flex-wrap:wrap}
+.stat{min-height:144px;display:flex;flex-direction:column;gap:6px;align-self:start}
+.stat .ico{font-size:24px}
+.stat b{font:800 30px var(--mono);background:linear-gradient(90deg,var(--cyan),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{color:var(--muted);font-size:12px}
+.bar-track{height:8px;background:rgba(122,140,255,.15);border-radius:5px;overflow:hidden}
+.bar-track i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:5px;transition:width .6s cubic-bezier(.2,.7,.2,1)}
+
+.art{min-height:216px;display:flex;flex-direction:column;gap:8px;cursor:pointer;position:relative}
+.art:hover{transform:translateY(-3px);border-color:var(--cyan);box-shadow:0 10px 30px rgba(34,211,238,.15)}
+.art.picked{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(34,211,238,.16)}
+.art.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 0 rgba(52,211,153,.6)}100%{box-shadow:0 0 0 16px rgba(52,211,153,0)}}
+.art .ico{font-size:26px}
+.art h4{font-size:15px;line-height:24px}
+.art .desc{color:var(--muted);font-size:12px;line-height:20px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.art .foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;font-size:12px;gap:8px;flex-wrap:wrap}
+.rating{color:var(--amber);font-family:var(--mono)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font:600 11px var(--mono);padding:3px 9px;border-radius:20px;background:rgba(139,92,246,.15);color:#c4b5fd;border:1px solid rgba(139,92,246,.3)}
+.tag.g{background:rgba(52,211,153,.12);color:var(--green);border-color:rgba(52,211,153,.35)}
+.tag.a{background:rgba(251,191,36,.12);color:var(--amber);border-color:rgba(251,191,36,.35)}
+.tag.r{background:rgba(248,113,113,.12);color:var(--red);border-color:rgba(248,113,113,.35)}
+.tag.b{background:rgba(79,124,255,.12);color:#9db4ff;border-color:rgba(79,124,255,.35)}
+.fresh{display:inline-flex;align-items:center;gap:6px;font:600 11px var(--sans)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.dot.g{background:var(--green);animation:pulse 2s infinite}
+.dot.a{background:var(--amber)}.dot.r{background:var(--red)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}70%{box-shadow:0 0 0 8px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+.pick{position:absolute;top:14px;right:14px;width:20px;height:20px;accent-color:var(--cyan);cursor:pointer}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field label{font:600 12px var(--sans);color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+input,select,textarea{background:rgba(7,11,22,.7);border:1px solid var(--line2);color:var(--text);border-radius:9px;padding:10px 12px;font:14px var(--sans);transition:.2s;width:100%}
+textarea{font-family:var(--mono);font-size:13px;line-height:20px;resize:vertical;min-height:96px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(34,211,238,.15)}
+input.bad,textarea.bad{border-color:var(--red);box-shadow:0 0 0 3px rgba(248,113,113,.15)}
+.check{display:flex;align-items:center;gap:8px;font:13px var(--mono);color:var(--muted);padding:6px 0;cursor:pointer}
+.check input{width:auto;accent-color:var(--cyan)}
+
+.step{display:flex;gap:16px;align-items:center;padding:16px;border:1px solid var(--line);border-radius:10px;margin-bottom:12px;background:var(--surface2);transition:.2s}
+.step[draggable=true]{cursor:grab}
+.step.dragging{opacity:.4;border-style:dashed}
+.step.over{border-color:var(--cyan);transform:scale(1.01)}
+.step.current{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(34,211,238,.12)}
+.step.done{opacity:.65}
+.step-n{width:36px;height:36px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 14px var(--mono);background:rgba(122,140,255,.15);color:var(--cyan)}
+.step.done .step-n{background:rgba(52,211,153,.2);color:var(--green)}
+.step-b{flex:1;min-width:0}.step-b b{font-size:14px}.step-b p{color:var(--muted);font-size:12px}
+.grip{color:var(--muted);font-size:16px;cursor:grab;user-select:none}
+
+.doc h4{font-size:16px;margin:16px 0 8px;color:var(--cyan)}
+.doc p{margin-bottom:8px;font-size:14px}
+.snippet{background:#0a0f1e;border:1px solid var(--line2);border-radius:10px;padding:16px;font:13px var(--mono);color:#a5f3fc;white-space:pre-wrap;margin-top:12px}
+.snippet .c{color:#64748b}
+.sandbox{background:#0a0f1e;border:1px solid var(--line2);border-radius:10px;overflow:hidden;margin-top:12px}
+.sandbox-h{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(122,140,255,.08);font:12px var(--mono);color:var(--muted)}
+.sandbox-h .dots{display:flex;gap:5px}.sandbox-h .dots i{width:9px;height:9px;border-radius:50%}
+.sandbox-b{padding:14px}
+.sandbox-out{font:12px var(--mono);white-space:pre-wrap;margin-top:12px;padding:12px;border-radius:8px;background:rgba(7,11,22,.8);min-height:48px}
+.sandbox-out.ok{color:var(--green);border:1px solid rgba(52,211,153,.35)}
+.sandbox-out.err{color:var(--red);border:1px solid rgba(248,113,113,.35)}
+.sandbox-hint{margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);color:var(--amber);font-size:12px}
+.step-done{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:9px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.35);color:var(--green);font-weight:600;font-size:13px}
+.notice{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:9px;font-size:13px;background:rgba(79,124,255,.1);border:1px solid rgba(79,124,255,.35);color:#bcd0ff}
+.notice.a{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.35);color:var(--amber)}
+.comment{border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px;background:var(--surface2)}
+.comment b{font-size:13px}.comment p{font-size:13px;margin-top:4px}
+.ans{margin-top:10px;padding:10px 12px;border-left:3px solid var(--green);background:rgba(52,211,153,.08);border-radius:6px;font-size:13px}
+.kv{display:grid;grid-template-columns:1fr auto;gap:8px 16px;font-size:13px;margin-top:12px}
+.kv span{color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font:600 11px var(--sans);text-transform:uppercase;letter-spacing:.5px}
+td.mono{font-family:var(--mono);font-size:12px}
+.empty{color:var(--muted);text-align:center;padding:24px}
+.tbl-wrap{overflow-x:auto}
+
+.scen{min-height:288px;display:flex;flex-direction:column;gap:10px}
+.scen .steps{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.scen .st{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--muted)}
+.scen .st i{width:18px;height:18px;flex:none;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font:700 10px var(--mono);font-style:normal}
+.scen .st.hit{color:var(--text)}.scen .st.hit i{background:var(--green);border-color:var(--green);color:#04211a}
+.scen .nums{display:flex;gap:16px;font:12px var(--mono);color:var(--muted);margin-top:auto;flex-wrap:wrap}
+.scen .nums b{color:var(--cyan)}
+details{margin-top:8px}summary{cursor:pointer;color:var(--cyan);font-size:12px}
+
+.scrim{position:fixed;inset:0;z-index:9998;background:rgba(4,7,14,.66);backdrop-filter:blur(4px);animation:fade .25s both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:min(520px,100%);z-index:9999;background:linear-gradient(180deg,#0b1224,#0a1020);border-left:1px solid var(--line2);box-shadow:-24px 0 80px rgba(0,0,0,.6);overflow-y:auto;padding:24px;animation:slide .3s cubic-bezier(.2,.7,.2,1) both}
+@keyframes slide{from{transform:translateX(100%)}to{transform:none}}
+.drawer-h{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}
+.drawer-h h3{font-size:18px;line-height:26px}
+.x{border:1px solid var(--line2);background:transparent;color:var(--muted);width:32px;height:32px;flex:none;border-radius:8px;cursor:pointer;font-size:16px;line-height:1}
+.x:hover{color:var(--red);border-color:var(--red)}
+.modal{position:fixed;inset:0;z-index:10001;background:rgba(4,7,14,.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px}
+.modal-box{width:100%;max-width:520px;max-height:85vh;overflow:auto;background:var(--bg2);border:1px solid var(--line2);border-radius:14px;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.6);animation:rise .3s both}
+.modal-box h3{font-size:18px;margin-bottom:8px}
+.toasts{position:fixed;top:24px;right:24px;z-index:10002;display:flex;flex-direction:column;gap:10px;max-width:380px}
+.toast{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line2);border-left:4px solid var(--blue);border-radius:10px;padding:12px 16px;font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:rise .3s both;transition:opacity .3s}
+.toast.g{border-left-color:var(--green)}.toast.r{border-left-color:var(--red)}.toast.a{border-left-color:var(--amber)}
+.toast.out{opacity:0}
+.t-act{margin-left:auto;border:1px solid var(--cyan);background:transparent;color:var(--cyan);border-radius:6px;padding:4px 10px;font:600 12px var(--sans);cursor:pointer;white-space:nowrap}
+.login-brand{min-height:384px}
+.login-form{min-height:384px;display:flex;flex-direction:column;justify-content:center}
+.acct{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:9px;padding:10px 14px;margin-bottom:8px;cursor:pointer;transition:.2s;font-size:13px;gap:12px}
+.acct:hover{border-color:var(--cyan)}
+.acct .mono{color:var(--muted);font-size:12px}
+.err{color:var(--red);font-size:13px;margin-top:8px}
+.preview{background:rgba(7,11,22,.55);border:1px dashed var(--line2);border-radius:10px;padding:16px}
+.preview h4{font-size:16px;color:var(--text);margin-bottom:8px}
+.bulkbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.3);border-radius:10px;padding:12px 16px}
+
+@media(max-width:900px){.m3,.m4,.m6,.m8{grid-column:1/-1}.feature,.stat,.art,.scen{min-height:auto}}
+@media(max-width:768px){.container{padding:16px}.container,.screen{gap:16px}nav.bar{position:static}.drawer{width:100%}.toasts{left:16px;right:16px;max-width:none}}
+</style>
+</head>
+<body>
+<div class="bg-aurora"></div><div class="bg-grain"></div>
+
+<section class="screen" id="s-login" style="max-width:1200px;margin:0 auto;padding:24px">
+  <div class="card feature m6 login-brand">
+    <div><h3>Документация, которая проверяет себя сама</h3>
+      <div class="big">📘 DevDocs</div>
+      <p>Живая база знаний команды: инструкции с интерактивной песочницей, отслеживание актуальности относительно кода и пошаговый онбординг новых разработчиков.</p></div>
+    <div class="meta"><span>🧪 Песочница</span><span>🔗 Git-синхронизация</span><span>📈 Онбординг</span></div>
+  </div>
+  <div class="card m6 login-form">
+    <h2 style="font-size:20px;margin-bottom:4px">Вход в систему</h2>
+    <p class="muted" style="margin-bottom:16px">Выберите учётную запись или введите данные вручную.</p>
+    <form id="f-login">
+      <div class="field"><label>Логин</label><input name="login" autocomplete="username" required></div>
+      <div class="field"><label>Пароль</label><input name="password" type="password" autocomplete="current-password" required></div>
+      <button class="btn btn-p" type="submit" style="width:100%">Войти</button>
+      <div class="err" id="login-err" hidden></div>
+    </form>
+    <div class="mt" id="accts"></div>
+  </div>
+</section>
+
+<div class="container" id="shell" hidden>
+  <header class="bar">
+    <div class="logo">📘 <b>DevDocs</b> <span class="badge-pro">PRO</span></div>
+    <div class="row"><div class="who"><b id="who-name"></b><span id="who-role"></span></div>
+      <button class="btn btn-s" data-act="logout">Выйти</button></div>
+  </header>
+  <nav class="bar" id="nav"></nav>
+  <section class="screen" id="s-overview" hidden></section>
+  <section class="screen" id="s-onboarding" hidden></section>
+  <section class="screen" id="s-kb" hidden></section>
+  <section class="screen" id="s-article" hidden></section>
+  <section class="screen" id="s-myarticles" hidden></section>
+  <section class="screen" id="s-editor" hidden></section>
+  <section class="screen" id="s-questions" hidden></section>
+  <section class="screen" id="s-moderation" hidden></section>
+  <section class="screen" id="s-analytics" hidden></section>
+  <section class="screen" id="s-team" hidden></section>
+  <section class="screen" id="s-scenarios" hidden></section>
+  <section class="screen" id="s-journal" hidden></section>
+  <section class="screen" id="s-profile" hidden></section>
+  <footer class="bar">© 2026 DevDocs — интерактивная база знаний для разработчиков</footer>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden></aside>
+<div class="modal" id="modal" hidden></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+"use strict";
+const ACCOUNTS=[
+ {id:"u_2001",login:"ivanov",password:"1234",name:"А.И. Иванов",role:"junior"},
+ {id:"u_2002",login:"petrova",password:"1234",name:"М.С. Петрова",role:"senior"},
+ {id:"u_2003",login:"sidorov",password:"admin",name:"Д.В. Сидоров",role:"teamlead"}];
+const ROLES={junior:"Junior Developer",senior:"Senior Developer",teamlead:"Team Lead / Admin"};
+const MENU={
+ junior:[["overview","Обзор"],["onboarding","Онбординг"],["kb","База знаний"],["scenarios","Сценарии"],["journal","Журнал"],["profile","Профиль"]],
+ senior:[["overview","Обзор"],["myarticles","Мои статьи"],["questions","Вопросы"],["kb","База знаний"],["scenarios","Сценарии"],["journal","Журнал"],["profile","Профиль"]],
+ teamlead:[["overview","Обзор"],["moderation","Модерация"],["analytics","Аналитика"],["team","Команда"],["scenarios","Сценарии"],["journal","Журнал"],["profile","Профиль"]]};
+const SCREENS={
+ junior:["overview","onboarding","kb","article","scenarios","journal","profile"],
+ senior:["overview","myarticles","editor","questions","kb","article","scenarios","journal","profile"],
+ teamlead:["overview","moderation","analytics","team","kb","article","scenarios","journal","profile"]};
+const PARENT={article:"kb",editor:"myarticles"};
+const REPO_FILES=["docker-compose.yml",".env.example","services.yaml",".gitlab-ci.yml","README.md","Dockerfile"];
+const KEY="devdocs_app_v3";
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=p=>p+"_"+Math.random().toString(36).slice(2,8);
+const stamp=()=>new Date().toISOString();
+const today=()=>new Date().toISOString().slice(0,10);
+const FRESH={green:["g","Актуально"],yellow:["a","Обновляется"],red:["r","Неактуально"]};
+
+const OP={H:.4,M:1.2,K:.4,P:1.1,T:.28};
+const T=n=>Array(n).fill("T");
+const gsum=o=>o.reduce((s,k)=>s+OP[k],0);
+const SCENARIOS=[
+ {id:1,role:"junior",name:"Прохождение шага онбординга с песочницей",entry:"onboarding",
+  hint:"Онбординг → статья Docker → команда docker --version → «Отметить шаг» прямо в статье.",
+  steps:[{a:"open_onboarding",l:"Открыть онбординг"},{a:"open_article",l:"Открыть статью шага"},{a:"run_sandbox",o:"success",l:"Успешно выполнить команду"},{a:"complete_step",l:"Отметить шаг в статье"}],
+  goms:[["Переход к онбордингу",["H","M","K"]],["Открытие статьи",["H","M","K"]],["Ввод команды (16 симв.)",["P","K","M",...T(16)]],["Запуск песочницы",["P","K","M"]],["Отметка шага в статье",["P","K","M"]]]},
+ {id:2,role:"junior",name:"Обработка ошибки в песочнице",entry:"onboarding",
+  hint:"Введите неверную команду, прочитайте подсказку, исправьте, выполните и отметьте шаг.",
+  steps:[{a:"run_sandbox",o:"failure",l:"Ошибка выполнения"},{a:"run_sandbox",o:"success",l:"Успешное выполнение"},{a:"complete_step",l:"Отметить шаг в статье"}],
+  goms:[["Открытие статьи",["H","M","K"]],["Неверная команда (9)",["P","K","M",...T(9)]],["Запуск",["P","K","M"]],["Анализ подсказки",["M","M"]],["Верная команда (16)",["P","K","M",...T(16)]],["Запуск",["P","K","M"]],["Отметка шага",["P","K","M"]]]},
+ {id:3,role:"senior",name:"Создание статьи с привязкой к репозиторию",entry:"editor",
+  hint:"Создать статью → привязать файл → добавить задание → «Сохранить черновик» → «Отправить на модерацию». Черновик остаётся в «Мои статьи».",
+  steps:[{a:"create_article",l:"Открыть редактор"},{a:"link_repo",l:"Привязать файл репозитория"},{a:"add_task",l:"Добавить задание"},{a:"save_draft",l:"Сохранить черновик"},{a:"send_moderation",l:"Отправить на модерацию"}],
+  goms:[["Открытие редактора",["H","M","K"]],["Заголовок (28)",["P","K","M",...T(28)]],["Содержимое (110)",["P","K","M",...T(110)]],["Теги (14)",["P","K","M",...T(14)]],["Привязка 2 файлов",["P","K","M","P","K","M"]],["Добавление задания",["P","K","M"]],["Команда задания (16)",["P","K","M",...T(16)]],["Сохранение",["P","K","M"]],["Отправка",["P","K","M"]]]},
+ {id:4,role:"senior",name:"Ответ на вопрос и актуализация статьи",entry:"questions",
+  hint:"Вопросы → открыть вопрос → ответить → «Актуализировать статью». Кнопка превращается в «Отметить неактуальной» — статус можно переключать.",
+  steps:[{a:"open_question",l:"Открыть вопрос"},{a:"answer_question",l:"Ответить на вопрос"},{a:"update_article",l:"Актуализировать статью"}],
+  goms:[["Открытие вопроса",["H","M","K"]],["Чтение вопроса",["M","M"]],["Ввод ответа (60)",["P","K","M",...T(60)]],["Отправка ответа",["P","K","M"]],["Актуализация",["P","K","M"]]]},
+ {id:5,role:"teamlead",name:"Модерация статьи и назначение наставника",entry:"moderation",
+  hint:"Модерация → опубликовать → аналитика → назначить наставника.",
+  steps:[{a:"open_moderation",l:"Открыть модерацию"},{a:"publish_article",l:"Опубликовать статью"},{a:"open_analytics",l:"Открыть аналитику"},{a:"assign_mentor",l:"Назначить наставника"}],
+  goms:[["Открытие модерации",["H","M","K"]],["Проверка стандартов",["M","M","M"]],["Публикация",["P","K","M"]],["Переход к аналитике",["H","M","K"]],["Назначение наставника",["P","K","M"]],["Выбор наставника",["P","K","M"]],["Подтверждение",["P","K"]]]}];
+SCENARIOS.forEach(s=>s.theory=+s.goms.reduce((a,[,o])=>a+gsum(o),0).toFixed(2));
+
+function seedData(){return{
+ articles:[
+  {id:"art_001",icon:"🐳",title:"Настройка локального окружения (Docker)",desc:"Пошаговая инструкция с интерактивной песочницей",tags:["docker","setup"],freshness:"green",rating:4.9,author:"М.С. Петрова",status:"published",repo:["docker-compose.yml",".env.example"],content:"## Установка Docker\nУстановите Docker Desktop и убедитесь, что демон запущен. Поднимите сервисы командой docker-compose up -d и проверьте установку командой docker --version.",snippet:"docker-compose up -d",task:{command:"docker --version",hint:"Используйте флаг --version для проверки установки Docker"},updated:"2026-11-01"},
+  {id:"art_002",icon:"🏗️",title:"Архитектура микросервисов",desc:"Обзор взаимодействия сервисов проекта",tags:["architecture","backend"],freshness:"green",rating:4.8,author:"М.С. Петрова",status:"published",repo:["services.yaml"],content:"## Обзор\nСистема состоит из API-шлюза, сервиса аутентификации и сервиса данных. Взаимодействие построено на асинхронных сообщениях через брокер.",snippet:"kubectl get services",task:null,updated:"2026-10-20"},
+  {id:"art_003",icon:"🔀",title:"Git-воркфлоу команды",desc:"Ветвление, коммиты и Pull Request",tags:["git","workflow"],freshness:"yellow",rating:4.7,author:"М.С. Петрова",status:"published",repo:[".gitlab-ci.yml"],content:"## Ветвление\nОсновная ветка — main. Feature-ветки именуются по шаблону feature/TASK-123. Перед слиянием обязателен code review и зелёный CI.",snippet:"git checkout -b feature/TASK-123-auth",task:null,updated:"2026-11-08"},
+  {id:"art_004",icon:"🔍",title:"Code Review: стандарты",desc:"Как проходить ревью в нашей команде",tags:["review","standards"],freshness:"red",rating:4.6,author:"Д.В. Сидоров",status:"published",repo:[],content:"## Стандарты ревью\nКаждый PR проверяется минимум одним senior-разработчиком. Обращайте внимание на читаемость, покрытие тестами и отсутствие дублирования.",snippet:"",task:null,updated:"2026-09-15"},
+  {id:"art_005",icon:"🧩",title:"Переменные окружения и секреты",desc:"Черновик: как мы храним конфигурацию сервисов",tags:["config","secrets"],freshness:"yellow",rating:0,author:"М.С. Петрова",status:"draft",repo:[".env.example"],content:"## Правило хранения\nСекреты не попадают в репозиторий. Локально используется .env, в кластере — секрет-хранилище. Пример обязательных переменных приведён в .env.example.",snippet:"cp .env.example .env",task:null,updated:"2026-11-18"},
+  {id:"art_006",icon:"🐳",title:"Настройка локального окружения",desc:"Обновлённая инструкция для новых сотрудников",tags:["docker","setup"],freshness:"green",rating:0,author:"М.С. Петрова",status:"moderation",repo:["docker-compose.yml",".env.example"],content:"## Быстрый старт\nПошаговая инструкция по развёртыванию окружения нового разработчика с интерактивной проверкой команд.",snippet:"docker-compose up -d",task:{command:"docker --version",hint:"Используйте флаг --version"},updated:"2026-11-10"}],
+ checklist:[
+  {id:"step_1",title:"Знакомство с командой и процессами",done:true},
+  {id:"step_2",title:"Доступы к репозиториям и сервисам",done:true},
+  {id:"step_3",title:"Настройка IDE и линтеров",done:true},
+  {id:"step_4",title:"Первый коммит и Pull Request",done:true},
+  {id:"step_5",title:"Настройка локального окружения (Docker)",done:false,articleId:"art_001"},
+  {id:"step_6",title:"Архитектура микросервисов",done:false,articleId:"art_002"},
+  {id:"step_7",title:"Git-воркфлоу команды",done:false,articleId:"art_003"},
+  {id:"step_8",title:"Code Review: стандарты",done:false,articleId:"art_004"},
+  {id:"step_9",title:"Работа с CI/CD",done:false},
+  {id:"step_10",title:"Первая задача в спринте",done:false}],
+ questions:[
+  {id:"q_001",articleId:"art_003",author:"А.И. Иванов",authorId:"u_2001",text:"Как правильно именовать feature-ветки для задач без номера в трекере?",status:"open",answer:null,edited:false},
+  {id:"q_002",articleId:"art_001",author:"А.И. Иванов",authorId:"u_2001",text:"Что делать, если docker-compose падает с ошибкой занятого порта?",status:"open",answer:null,edited:false}],
+ team:[
+  {id:"u_2001",name:"А.И. Иванов",role:"junior",progress:40,mentor:null},
+  {id:"u_2002",name:"М.С. Петрова",role:"senior",progress:100,mentor:null},
+  {id:"u_2003",name:"Д.В. Сидоров",role:"teamlead",progress:100,mentor:null}],
+ views:[]};}
+
+let S=null;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!S.data)S={session:null,sessionId:null,screen:null,articleId:null,editArticleId:null,editorMode:"create",kbFilters:{},data:seedData(),log:[],completed:{},sandboxPassed:{},sel:[]};
+S.completed=S.completed||{};S.sandboxPassed=S.sandboxPassed||{};S.sel=S.sel||[];S.data.views=S.data.views||[];
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const me=()=>ACCOUNTS.find(a=>a.id===S.session)||null;
+const actorName=id=>{const a=ACCOUNTS.find(x=>x.id===id);return a?a.name:id};
+const artById=id=>S.data.articles.find(a=>a.id===id);
+const qById=id=>S.data.questions.find(q=>q.id===id);
+const progress=()=>Math.round(S.data.checklist.filter(s=>s.done).length/S.data.checklist.length*100);
+function reflowSteps(){S.data.checklist.forEach(s=>s.current=false);const n=S.data.checklist.find(s=>!s.done);if(n)n.current=true}
+reflowSteps();
+
+/* ---------- log + scenarios ---------- */
+const sessionEvents=()=>S.log.filter(e=>e.context.correlation_id===S.sessionId);
+function logEvent(action,objectType,objectId,outcome,changes){
+ const u=me();S.log.push({timestamp:stamp(),actor_id:u?u.id:"guest",actor_role:u?u.role:"guest",action,object_type:objectType,object_id:objectId,outcome:outcome||"success",changes:changes||{},context:{correlation_id:S.sessionId||"auth"}});
+ save();detectCompletion();
+ if(S.screen==="scenarios")renderScenarios();
+ if(S.screen==="journal")renderJournal();
+ updateNavPill();}
+const matchStep=(e,st)=>st&&e.action===st.a&&(!st.o||e.outcome===st.o);
+function liveProgress(sc){let i=0;for(const e of sessionEvents())if(matchStep(e,sc.steps[i]))i++;return i}
+function completions(ev,sc){const r=[];let i=0,f=null,l=null;for(const e of ev){if(matchStep(e,sc.steps[i])){if(!f)f=e;l=e;i++;if(i===sc.steps.length){r.push({first:f,last:l,ms:new Date(l.timestamp)-new Date(f.timestamp)});i=0;f=null;l=null}}}return r}
+function detectCompletion(){const ev=sessionEvents();SCENARIOS.forEach(sc=>{const c=completions(ev,sc),k=S.sessionId+":"+sc.id;
+ if(c.length&&!S.completed[k]){S.completed[k]=c[c.length-1].ms;save();toast(`Сценарий ${sc.id} выполнен за ${(c[c.length-1].ms/1000).toFixed(2)} с (норматив ${sc.theory} с)`,"g")}})}
+
+/* ---------- ui helpers ---------- */
+function toast(text,kind,action){const el=document.createElement("div");el.className="toast "+(kind||"");
+ el.innerHTML=`<span>${kind==="g"?"✓":kind==="r"?"✕":kind==="a"?"!":"•"}</span><span>${esc(text)}</span>`;
+ if(action){const b=document.createElement("button");b.className="t-act";b.textContent=action.label;b.onclick=()=>{action.fn();el.remove()};el.appendChild(b)}
+ $("#toasts").appendChild(el);setTimeout(()=>{el.classList.add("out");setTimeout(()=>el.remove(),320)},action?7000:3600);}
+function openDrawer(html){$("#drawer").innerHTML=html;$("#drawer").hidden=false;$("#scrim").hidden=false;document.body.style.overflow="hidden"}
+function closeDrawer(){$("#drawer").hidden=true;$("#scrim").hidden=true;$("#drawer").innerHTML="";document.body.style.overflow=""}
+function openModal(html){$("#modal").innerHTML=`<div class="modal-box">${html}</div>`;$("#modal").hidden=false}
+function closeModal(){$("#modal").hidden=true;$("#modal").innerHTML=""}
+const freshBadge=f=>{const v=FRESH[f]||FRESH.green;return `<span class="fresh"><span class="dot ${v[0]}"></span>${v[1]}</span>`};
+const STATUS={published:["g","Опубликована"],moderation:["a","На модерации"],draft:["b","Черновик"],rejected:["r","Отклонена"],open:["a","Открыт"],answered:["g","Отвечен"]};
+const statusTag=s=>{const v=STATUS[s]||["",s];return `<span class="tag ${v[0]}">${v[1]}</span>`};
+const freshBtn=a=>a.freshness==="green"
+ ? `<button class="btn btn-s btn-a" data-act="toggle-fresh" data-id="${a.id}">⚠ Отметить неактуальной</button>`
+ : `<button class="btn btn-s btn-g" data-act="toggle-fresh" data-id="${a.id}">✓ Актуализировать статью</button>`;
+const renderDoc=c=>String(c||"").split("\n").filter(Boolean).map(l=>l.startsWith("## ")?`<h4>${esc(l.slice(3))}</h4>`:`<p>${esc(l)}</p>`).join("")||'<p class="muted">Содержимое не заполнено.</p>';
+
+function artCard(a){return `<div class="card art m4" data-act="open-article" data-id="${a.id}">
+ <div class="ico">${a.icon||"📄"}</div><h4>${esc(a.title)}</h4><div class="desc">${esc(a.desc||"")}</div>
+ <div class="tags">${a.tags.map(t=>`<span class="tag">#${esc(t)}</span>`).join("")}</div>
+ <div class="foot"><span class="rating">⭐ ${a.rating||"—"}</span>${freshBadge(a.freshness)}</div></div>`}
+
+function completeStep(id){const s=S.data.checklist.find(x=>x.id===id);if(!s||s.done)return false;
+ s.done=true;reflowSteps();const t=S.data.team.find(x=>x.id===(me()||{}).id);if(t)t.progress=progress();
+ logEvent("complete_step","step",id,"success",{progress:progress()});save();
+ toast(`Шаг выполнен. Прогресс онбординга: ${progress()}%`,"g");return true}
+
+function stepCardHTML(a){const u=me();if(!u||u.role!=="junior")return "";
+ const step=S.data.checklist.find(s=>s.articleId===a.id);if(!step)return "";
+ if(step.done){const next=S.data.checklist.find(s=>!s.done);
+  return `<div class="card mt" id="step-card"><div class="step-done">✓ Шаг онбординга выполнен</div>
+  <p class="muted mt-s" style="font-size:12px">Прогресс ${progress()}% · ${S.data.checklist.filter(s=>s.done).length} из ${S.data.checklist.length}</p>
+  <div class="bar-track mt-s"><i style="width:${progress()}%"></i></div>
+  ${next&&next.articleId?`<button class="btn btn-p btn-s mt" data-act="open-article" data-id="${next.articleId}">Следующий шаг →</button>`:next?`<p class="muted mt-s" style="font-size:12px">Далее: «${esc(next.title)}» — в разделе Онбординг.</p>`:`<p class="mt-s" style="color:var(--green);font-weight:600">🎉 Онбординг завершён!</p>`}</div>`}
+ const ok=!a.task||!!S.sandboxPassed[a.id];
+ return `<div class="card mt" id="step-card"><h3 style="font-size:15px">🎯 Шаг онбординга</h3>
+ <p class="muted mt-s" style="font-size:12px">${esc(step.title)}</p>
+ <button class="btn btn-g mt ${ok&&a.task?"ready":""}" data-act="complete-step-article" data-id="${step.id}" ${ok?"":"disabled"} style="width:100%">✓ Отметить шаг выполненным</button>
+ <p class="muted mt-s" style="font-size:11px">${a.task?(ok?"Задание выполнено — отмечайте шаг, не выходя из статьи.":"Кнопка станет доступна после успешного выполнения задания."):"Прочитали статью — отметьте шаг, не выходя из неё."}</p></div>`}
+
+/* ---------- router ---------- */
+const SCREEN_LOG={overview:()=>["open_overview","screen","overview"],onboarding:()=>["open_onboarding","screen","onboarding"],kb:()=>["open_kb","screen","kb"],article:()=>["open_article","article",S.articleId||"unknown"],myarticles:()=>["open_my_articles","screen","myarticles"],editor:()=>S.editorMode==="edit"?["open_editor","article",S.editArticleId]:["create_article","article","new"],questions:()=>["open_questions","screen","questions"],moderation:()=>["open_moderation","screen","moderation"],analytics:()=>["open_analytics","screen","analytics"],team:()=>["open_team","screen","team"],scenarios:()=>["open_scenarios","screen","scenarios"],journal:()=>["open_journal","screen","journal"],profile:()=>["open_profile","screen","profile"]};
+const RENDER={overview:renderOverview,onboarding:renderOnboarding,kb:renderKB,article:renderArticle,myarticles:renderMyArticles,editor:renderEditor,questions:renderQuestions,moderation:renderModeration,analytics:renderAnalytics,team:renderTeam,scenarios:renderScenarios,journal:renderJournal,profile:renderProfile};
+function updateNavPill(){const p=$("#nav .pill");if(!p)return;const u=me();if(!u)return;
+ const own=SCENARIOS.filter(s=>s.role===u.role);const done=own.filter(s=>liveProgress(s)===s.steps.length).length;
+ p.textContent=`Сценарии ${done}/${own.length}`}
+function go(screen){const u=me();if(!u)return;if(!SCREENS[u.role].includes(screen))screen=MENU[u.role][0][0];
+ closeDrawer();S.screen=screen;
+ document.querySelectorAll("#shell .screen").forEach(s=>s.hidden=true);
+ const sec=$("#s-"+screen);if(sec)sec.hidden=false;
+ const active=PARENT[screen]||screen;
+ $("#nav").innerHTML=MENU[u.role].map(([id,n])=>`<button data-act="go" data-id="${id}" class="${id===active?"on":""}">${n}</button>`).join("")+`<span class="pill"></span>`;
+ const lg=SCREEN_LOG[screen];if(lg){const[a,t,id]=lg();logEvent(a,t,id)}
+ RENDER[screen]();updateNavPill();save();window.scrollTo({top:0,behavior:"smooth"});}
+
+/* ---------- screens ---------- */
+function renderOverview(){const u=me();const pub=S.data.articles.filter(a=>a.status==="published");
+ const freshPct=pub.length?Math.round(pub.filter(a=>a.freshness==="green").length/pub.length*100):0;
+ let feature,stats;
+ if(u.role==="junior"){const cur=S.data.checklist.find(s=>!s.done);const ca=cur&&cur.articleId?artById(cur.articleId):null;
+  feature=`<div class="card feature m6"><div><h3>🔥 Текущий шаг онбординга</h3><div class="big">${esc(cur?cur.title:"Все шаги выполнены")}</div><p>Интерактивная инструкция с песочницей. Запускайте команды, получайте проверку результата и отмечайте шаг прямо в статье.</p></div><div class="meta"><span>👤 М. Петрова</span><span>⏱️ 10 мин</span>${ca?freshBadge(ca.freshness):freshBadge("green")}</div><div class="row mt"><button class="btn btn-p" data-act="go" data-id="onboarding">Перейти к онбордингу</button>${ca?`<button class="btn" data-act="open-article" data-id="${ca.id}">Открыть статью</button>`:""}</div></div>`;
+  stats=`<div class="card stat m3"><div class="ico">📊</div><span>Прогресс онбординга</span><b>${progress()}%</b><div class="bar-track"><i style="width:${progress()}%"></i></div><span>${S.data.checklist.filter(s=>s.done).length} из ${S.data.checklist.length} шагов</span></div><div class="card stat m3"><div class="ico">📚</div><span>Всего статей</span><b>${pub.length}</b><span>${freshPct}% актуальны</span></div>`;}
+ else if(u.role==="senior"){const mine=S.data.articles.filter(a=>a.author===u.name);const drafts=mine.filter(a=>a.status==="draft").length;
+  const openQ=S.data.questions.filter(q=>q.status==="open"&&(artById(q.articleId)||{}).author===u.name).length;
+  const stale=mine.filter(a=>a.freshness!=="green").length;
+  feature=`<div class="card feature m6"><div><h3>✍️ Ваши материалы</h3><div class="big">${drafts} черновик(ов) · ${openQ} вопрос(ов)</div><p>Черновики сохраняются в «Мои статьи» — их можно открыть, дочитать и отправить на модерацию в любой момент.</p></div><div class="row mt"><button class="btn btn-p" data-act="go" data-id="myarticles">Мои статьи</button><button class="btn" data-act="art-new">Создать статью</button><button class="btn" data-act="go" data-id="questions">Вопросы</button></div></div>`;
+  stats=`<div class="card stat m3"><div class="ico">📝</div><span>Моих статей</span><b>${mine.length}</b><span>${drafts} в черновиках</span></div><div class="card stat m3"><div class="ico">🔄</div><span>Требуют актуализации</span><b>${stale}</b><span>из ${mine.length} ваших статей</span></div>`;}
+ else{const mod=S.data.articles.filter(a=>a.status==="moderation").length;const avg=Math.round(S.data.team.reduce((s,t)=>s+t.progress,0)/S.data.team.length);
+  feature=`<div class="card feature m6"><div><h3>🛡️ Статьи на модерации</h3><div class="big">${mod} статья(й) ожидают проверки</div><p>Проверяйте соответствие стандартам компании и публикуйте материалы. Контролируйте прогресс адаптации команды.</p></div><div class="row mt"><button class="btn btn-p" data-act="go" data-id="moderation">Перейти к модерации</button><button class="btn" data-act="go" data-id="analytics">Аналитика</button></div></div>`;
+  stats=`<div class="card stat m3"><div class="ico">📈</div><span>Средний прогресс</span><b>${avg}%</b><div class="bar-track"><i style="width:${avg}%"></i></div><span>по команде</span></div><div class="card stat m3"><div class="ico">📚</div><span>Всего статей</span><b>${pub.length}</b><span>${freshPct}% актуальны</span></div>`;}
+ $("#s-overview").innerHTML=`<div class="head"><div><h2>Рабочее пространство</h2><div class="sub">Сводка по вашим задачам и материалам команды</div></div></div>`+feature+stats+pub.slice(0,3).map(artCard).join("");}
+
+function renderOnboarding(){
+ $("#s-onboarding").innerHTML=`<div class="head"><div><h2>Онбординг</h2><div class="sub">Персональный чеклист адаптации</div></div></div>
+ <div class="card m4"><div style="font-size:24px">📊</div><b style="font:800 30px var(--mono);color:var(--cyan)">${progress()}%</b><div class="bar-track mt-s"><i style="width:${progress()}%"></i></div><p class="muted mt">Выполнено ${S.data.checklist.filter(s=>s.done).length} из ${S.data.checklist.length}</p><div class="sep"></div><p class="muted" style="font-size:12px">Шаги можно перетаскивать за ⠿, меняя порядок адаптации. Отметить шаг можно и прямо в статье после выполнения задания.</p></div>
+ <div class="m8" id="steps">${S.data.checklist.map((s,i)=>`<div class="step ${s.done?"done":""} ${s.current?"current":""}" draggable="true" data-step="${s.id}">
+  <span class="grip">⠿</span><div class="step-n">${s.done?"✓":i+1}</div>
+  <div class="step-b"><b>${esc(s.title)}</b><p>${s.done?"Шаг выполнен":s.current?"Текущий шаг":"Ожидает выполнения"}</p></div>
+  <div class="row">${s.articleId?`<button class="btn btn-s" data-act="open-article" data-id="${s.articleId}">Статья</button>`:""}${!s.done?`<button class="btn btn-s btn-g" data-act="complete-step" data-id="${s.id}">Отметить</button>`:""}</div></div>`).join("")}</div>`;
+ bindDrag();}
+
+function bindDrag(){const wrap=$("#steps");if(!wrap)return;let src=null;
+ wrap.querySelectorAll("[data-step]").forEach(el=>{
+  el.addEventListener("dragstart",e=>{src=el.dataset.step;el.classList.add("dragging");e.dataTransfer.effectAllowed="move";try{e.dataTransfer.setData("text/plain",src)}catch(x){}});
+  el.addEventListener("dragend",()=>{el.classList.remove("dragging");wrap.querySelectorAll(".over").forEach(n=>n.classList.remove("over"))});
+  el.addEventListener("dragover",e=>{e.preventDefault();if(el.dataset.step!==src)el.classList.add("over")});
+  el.addEventListener("dragleave",()=>el.classList.remove("over"));
+  el.addEventListener("drop",e=>{e.preventDefault();el.classList.remove("over");const dst=el.dataset.step;if(!src||src===dst)return;
+   const arr=S.data.checklist;const a=arr.findIndex(x=>x.id===src),b=arr.findIndex(x=>x.id===dst);if(a<0||b<0)return;
+   const [m]=arr.splice(a,1);arr.splice(b,0,m);reflowSteps();logEvent("reorder_steps","checklist","onboarding","success",{moved:src,to:b+1});save();renderOnboarding();toast("Порядок шагов обновлён","g")});});}
+
+function renderKB(){
+ $("#s-kb").innerHTML=`<div class="head"><div><h2>База знаний</h2><div class="sub">Техническая документация команды</div></div><span class="muted" id="kb-count"></span></div>
+ <div class="card m12"><div class="row"><input id="kb-q" placeholder="Поиск по названию и тегам…" style="flex:2;min-width:200px"><select id="kb-fresh" style="flex:1;min-width:150px"><option value="">Свежесть: любая</option><option value="green">Актуально</option><option value="yellow">Обновляется</option><option value="red">Неактуально</option></select><select id="kb-sort" style="flex:1;min-width:150px"><option value="rating">По рейтингу</option><option value="title">По названию</option><option value="updated">По дате</option></select><button class="btn btn-s" data-act="kb-saveview">Сохранить вид</button><select id="kb-views" style="flex:1;min-width:160px"><option value="">Сохранённые виды…</option>${S.data.views.map((v,i)=>`<option value="${i}">${esc(v.name)}</option>`).join("")}</select><button class="btn btn-s btn-r" data-act="kb-delview">Удалить вид</button></div></div>
+ <div class="screen m12" id="kb-list" style="padding:0"></div>`;
+ $("#kb-q").value=S.kbFilters.q||"";$("#kb-fresh").value=S.kbFilters.fresh||"";$("#kb-sort").value=S.kbFilters.sort||"rating";
+ ["kb-q","kb-fresh","kb-sort"].forEach(id=>$("#"+id).addEventListener("input",()=>{S.kbFilters={q:$("#kb-q").value,fresh:$("#kb-fresh").value,sort:$("#kb-sort").value};save();updateKBList()}));
+ $("#kb-views").addEventListener("change",e=>{const v=S.data.views[+e.target.value];if(v){S.kbFilters={...v.f};save();renderKB();toast("Вид применён: "+v.name,"g")}});
+ updateKBList();}
+function updateKBList(){let list=S.data.articles.filter(a=>a.status==="published");const f=S.kbFilters;
+ if(f.q){const q=f.q.toLowerCase();list=list.filter(a=>(a.title+" "+a.tags.join(" ")).toLowerCase().includes(q))}
+ if(f.fresh)list=list.filter(a=>a.freshness===f.fresh);
+ const s=f.sort||"rating";list.sort((a,b)=>s==="title"?a.title.localeCompare(b.title):s==="updated"?b.updated.localeCompare(a.updated):b.rating-a.rating);
+ $("#kb-count").textContent="Найдено: "+list.length;
+ $("#kb-list").innerHTML=list.map(artCard).join("")||`<div class="card empty m12">Статьи не найдены. Измените условия поиска.</div>`;}
+
+function renderArticle(){const a=artById(S.articleId);if(!a){go("kb");return}const u=me();
+ const qs=S.data.questions.filter(q=>q.articleId===a.id);
+ const owner=u.role==="senior"&&a.author===u.name;
+ const passed=!!S.sandboxPassed[a.id];
+ const mineQ=q=>q.authorId===u.id||q.author===u.name;
+ $("#s-article").innerHTML=`<div class="head"><div><h2>${esc(a.title)}</h2><div class="sub">${esc(a.author)} · обновлено ${a.updated} · ${freshBadge(a.freshness)} · ${statusTag(a.status)}</div></div><button class="btn btn-s" data-act="go" data-id="${u.role==="senior"?"myarticles":"kb"}">← Назад</button></div>
+ <div class="card m8">
+  ${a.status!=="published"?`<div class="notice a">📝 Это ${a.status==="draft"?"черновик":a.status==="moderation"?"статья на модерации":"отклонённая статья"} — она видна только автору и тимлиду.</div>`:""}
+  <div class="row mt" style="justify-content:space-between"><div class="tags">${a.tags.map(t=>`<span class="tag">#${esc(t)}</span>`).join("")||'<span class="muted">без тегов</span>'}</div><span class="rating">⭐ ${a.rating||"—"}</span></div>
+  <div class="doc mt">${renderDoc(a.content)}</div>
+  ${a.snippet?`<div class="snippet"><span class="c"># сниппет</span>\n${esc(a.snippet)}</div>`:""}
+  ${a.repo.length?`<p class="muted mt">🔗 Привязано к файлам: ${a.repo.map(r=>`<code class="mono">${esc(r)}</code>`).join(", ")}</p>`:`<p class="muted mt">🔗 Привязка к репозиторию не задана.</p>`}
+  <div class="row mt"><button class="btn btn-s" data-act="rate" data-id="${a.id}">👍 Полезно</button><button class="btn btn-s" data-act="ask" data-id="${a.id}">Задать вопрос</button>${owner?`<button class="btn btn-s btn-p" data-act="art-edit" data-id="${a.id}">Редактировать</button>${freshBtn(a)}`:""}</div></div>
+ <div class="m4"><div class="card">${a.task?`<h3 style="font-size:15px">🧪 Интерактивное задание</h3><p class="muted" style="font-size:12px">Выполните команду — система проверит результат.</p>
+  <div class="sandbox"><div class="sandbox-h"><span class="dots"><i style="background:var(--red)"></i><i style="background:var(--amber)"></i><i style="background:var(--green)"></i></span>sandbox · bash</div>
+  <div class="sandbox-b"><textarea id="sandbox-cmd" placeholder="docker --version" style="min-height:64px"></textarea>
+  <div class="row mt"><button class="btn btn-g btn-s" data-act="run-sandbox" data-id="${a.id}">▶ Запустить</button><span class="muted mono" style="font-size:11px">Ctrl+Enter</span></div>
+  <div id="sandbox-out" class="sandbox-out${passed?" ok":""}">${passed?"$ "+esc(a.task.command)+"\n✓ Задание уже выполнено.":"$ ожидание команды…"}</div><div id="sandbox-hint" class="sandbox-hint" hidden></div></div></div>`
+  :`<h3 style="font-size:15px">🧪 Интерактивное задание</h3><p class="muted" style="font-size:12px">Для этой статьи задание не предусмотрено.</p>`}</div>
+  ${stepCardHTML(a)}
+  <div class="card mt"><h3 style="font-size:15px">💬 Вопросы (${qs.length})</h3>${qs.length?qs.map(q=>`<div class="comment mt"><div class="row" style="justify-content:space-between"><b>${esc(q.author)}</b>${statusTag(q.status)}</div><p>${esc(q.text)}</p>${q.edited?'<span class="muted" style="font-size:11px">изменено автором</span>':""}${q.answer?`<div class="ans"><b>Ответ:</b> ${esc(q.answer)}</div>`:`<p class="muted" style="font-size:12px">Ожидает ответа</p>`}<div class="row mt-s"><button class="btn btn-s" data-act="open-question" data-id="${q.id}">Открыть</button>${mineQ(q)?`<button class="btn btn-s" data-act="edit-question" data-id="${q.id}">Редактировать вопрос</button>`:""}</div></div>`).join(""):`<p class="muted mt">Вопросов пока нет.</p>`}</div></div>`;}
+
+function renderMyArticles(){const u=me();const list=S.data.articles.filter(a=>a.author===u.name);
+ S.sel=S.sel.filter(id=>list.some(a=>a.id===id));
+ const sel=S.sel.length;
+ $("#s-myarticles").innerHTML=`<div class="head"><div><h2>Мои статьи</h2><div class="sub">Всего ${list.length} · черновиков ${list.filter(a=>a.status==="draft").length} · на модерации ${list.filter(a=>a.status==="moderation").length}</div></div><button class="btn btn-p" data-act="art-new">+ Создать статью</button></div>
+ <div class="m12 bulkbar"><label class="check" style="padding:0"><input type="checkbox" id="sel-all" ${sel&&sel===list.length?"checked":""}> Выбрать все</label>
+  <span class="muted">Выбрано: <b style="color:var(--cyan)">${sel}</b></span>
+  <button class="btn btn-s btn-g" data-act="bulk-send" ${sel?"":"disabled"}>Отправить на модерацию</button>
+  <button class="btn btn-s btn-r" data-act="bulk-delete" ${sel?"":"disabled"}>Удалить выбранные</button>
+  ${sel?`<button class="btn btn-s" data-act="bulk-clear">Снять выделение</button>`:""}
+  <span class="muted" style="margin-left:auto;font-size:12px">Нажмите на карточку, чтобы прочитать содержимое</span></div>`+
+ (list.map(a=>`<div class="card art m4 ${S.sel.includes(a.id)?"picked":""} ${S.flash===a.id?"flash":""}" data-act="preview-article" data-id="${a.id}">
+  <input type="checkbox" class="pick" data-act="pick" data-id="${a.id}" ${S.sel.includes(a.id)?"checked":""}>
+  <div class="row" style="justify-content:space-between;padding-right:28px"><div class="ico">${a.icon||"📄"}</div>${statusTag(a.status)}</div>
+  <h4>${esc(a.title)}</h4><div class="desc">${esc(a.desc||a.content.slice(0,90))}</div>
+  <div class="row" style="justify-content:space-between;font-size:12px"><span class="muted mono">${a.updated}</span>${freshBadge(a.freshness)}</div>
+  <div class="row" style="margin-top:auto"><button class="btn btn-s btn-p" data-act="art-edit" data-id="${a.id}">Редактировать</button><button class="btn btn-s" data-act="open-article" data-id="${a.id}">Открыть</button>${a.status==="draft"||a.status==="rejected"?`<button class="btn btn-s btn-g" data-act="art-send-existing" data-id="${a.id}">На модерацию</button>`:""}<button class="btn btn-s btn-r" data-act="art-delete" data-id="${a.id}">Удалить</button></div></div>`).join("")
+  ||`<div class="card empty m12">Статей пока нет. Создайте первую — черновик сохранится и появится здесь.</div>`);
+ S.flash=null;
+ const all=$("#sel-all");if(all)all.addEventListener("change",e=>{S.sel=e.target.checked?list.map(a=>a.id):[];save();renderMyArticles()});}
+
+function previewDrawer(id){const a=artById(id);if(!a)return;
+ openDrawer(`<div class="drawer-h"><div><h3>${esc(a.title)}</h3><div class="row mt-s">${statusTag(a.status)}${freshBadge(a.freshness)}</div></div><button class="x" data-act="drawer-close">✕</button></div>
+ <p class="muted" style="font-size:12px">Автор ${esc(a.author)} · обновлено ${a.updated} · ⭐ ${a.rating||"—"}</p>
+ <div class="tags mt">${a.tags.map(t=>`<span class="tag">#${esc(t)}</span>`).join("")||'<span class="muted">без тегов</span>'}</div>
+ <div class="sep"></div><div class="doc">${renderDoc(a.content)}</div>
+ ${a.snippet?`<div class="snippet"><span class="c"># сниппет</span>\n${esc(a.snippet)}</div>`:""}
+ <div class="kv"><span>Привязка к репозиторию</span><b>${a.repo.length?a.repo.join(", "):"нет"}</b><span>Интерактивное задание</span><b>${a.task?esc(a.task.command):"нет"}</b><span>Подсказка</span><b>${a.task?esc(a.task.hint||"—"):"—"}</b></div>
+ <div class="sep"></div>
+ <div class="row"><button class="btn btn-p" data-act="art-edit" data-id="${a.id}">Редактировать</button><button class="btn" data-act="open-article" data-id="${a.id}">Открыть полностью</button>${a.status==="draft"||a.status==="rejected"?`<button class="btn btn-g" data-act="art-send-existing" data-id="${a.id}">На модерацию</button>`:""}${freshBtn(a)}<button class="btn btn-r" data-act="art-delete" data-id="${a.id}">Удалить</button></div>`);}
+
+function renderEditor(){const a=S.editorMode==="edit"?artById(S.editArticleId):null;
+ $("#s-editor").innerHTML=`<div class="head"><div><h2>${a?"Редактирование статьи":"Новая статья"}</h2><div class="sub">${a?"Черновик сохранён в «Мои статьи» — можно вернуться к нему позже":"Заполните поля и сохраните черновик"}</div></div><button class="btn btn-s" data-act="go" data-id="myarticles">← К моим статьям</button></div>
+ <div class="m8">
+  ${a?`<div class="notice">💾 ${statusTag(a.status)} <span>«${esc(a.title)}» — id <code class="mono">${a.id}</code>. Изменения применяются к этой же записи.</span></div>`:""}
+  <div class="card ${a?"mt":""}">
+   <div class="field"><label>Заголовок *</label><input id="ed-title" value="${a?esc(a.title):""}" placeholder="Например: Настройка локального окружения"></div>
+   <div class="field"><label>Содержимое (Markdown) *</label><textarea id="ed-content" style="min-height:180px" placeholder="## Заголовок раздела&#10;Текст инструкции…">${a?esc(a.content):""}</textarea></div>
+   <div class="field"><label>Теги (через запятую)</label><input id="ed-tags" value="${a?esc(a.tags.join(", ")):""}" placeholder="docker, setup"></div>
+   <div class="field" style="margin-bottom:0"><label>Сниппет кода</label><textarea id="ed-snippet" style="min-height:64px" placeholder="docker-compose up -d">${a?esc(a.snippet):""}</textarea></div>
+  </div>
+  <div class="card mt"><h3 style="font-size:15px">👁 Предпросмотр</h3><div class="preview mt" id="ed-preview"></div></div>
+ </div>
+ <div class="m4">
+  <div class="card"><h3 style="font-size:15px">🔗 Привязка к репозиторию</h3><div id="repo-box">${REPO_FILES.map(r=>`<label class="check"><input type="checkbox" class="ed-repo" value="${r}" ${a&&a.repo.includes(r)?"checked":""}> ${r}</label>`).join("")}</div></div>
+  <div class="card mt"><h3 style="font-size:15px">🧪 Интерактивное задание</h3><button class="btn btn-s mt" data-act="add-task">+ Добавить задание</button>
+   <div id="task-block" ${a&&a.task?"":"hidden"} class="mt"><div class="field"><label>Ожидаемая команда</label><input id="ed-taskcmd" value="${a&&a.task?esc(a.task.command):""}" placeholder="docker --version"></div><div class="field" style="margin-bottom:0"><label>Подсказка при ошибке</label><input id="ed-taskhint" value="${a&&a.task?esc(a.task.hint):""}" placeholder="Используйте флаг --version"></div></div></div>
+  <div class="card mt"><div class="row"><button class="btn btn-p" data-act="art-save" style="width:100%">💾 Сохранить черновик</button><button class="btn btn-g" data-act="art-send" style="width:100%">📤 Отправить на модерацию</button>${a?`<button class="btn btn-s" data-act="preview-article" data-id="${a.id}" style="width:100%">Просмотреть сохранённое</button>`:""}</div>
+   <p class="muted mt-s" style="font-size:11px">Черновик не теряется: он появляется в «Мои статьи» и открывается для чтения и правки.</p></div>
+ </div>`;
+ const upd=()=>{const v=collectEditor();$("#ed-preview").innerHTML=`<h4>${esc(v.title||"Без заголовка")}</h4><div class="tags">${v.tags.map(t=>`<span class="tag">#${esc(t)}</span>`).join("")}</div><div class="doc mt-s">${renderDoc(v.content)}</div>${v.snippet?`<div class="snippet">${esc(v.snippet)}</div>`:""}`};
+ ["ed-title","ed-content","ed-tags","ed-snippet"].forEach(id=>$("#"+id).addEventListener("input",()=>{$("#"+id).classList.remove("bad");upd()}));
+ upd();}
+
+function collectEditor(){const g=id=>{const e=$("#"+id);return e?e.value:""};
+ return{title:g("ed-title").trim(),content:g("ed-content").trim(),
+  desc:g("ed-content").replace(/##\s*/g,"").split("\n").filter(Boolean)[0]?.slice(0,80)||"",
+  tags:g("ed-tags").split(",").map(t=>t.trim()).filter(Boolean),
+  snippet:g("ed-snippet").trim(),
+  repo:Array.from(document.querySelectorAll(".ed-repo")).filter(c=>c.checked).map(c=>c.value),
+  task:g("ed-taskcmd").trim()?{command:g("ed-taskcmd").trim(),hint:g("ed-taskhint").trim()}:null,
+  updated:today()};}
+
+function persistArticle(send){const v=collectEditor();
+ if(!v.title){$("#ed-title").classList.add("bad");$("#ed-title").focus();toast("Укажите заголовок статьи","r");return}
+ if(!v.content){$("#ed-content").classList.add("bad");$("#ed-content").focus();toast("Заполните содержимое статьи","r");return}
+ let a=S.editArticleId?artById(S.editArticleId):null;
+ if(a){Object.assign(a,v);a.freshness="green";logEvent("update_article","article",a.id,"success",{title:v.title});}
+ else{a={id:uid("art"),icon:"📄",...v,rating:0,author:me().name,status:"draft",freshness:"green"};
+  S.data.articles.push(a);S.editArticleId=a.id;S.editorMode="edit";
+  logEvent("save_draft","article",a.id,"success",{title:v.title});}
+ if(send){a.status="moderation";logEvent("send_moderation","article",a.id);S.flash=a.id;S.editorMode="create";S.editArticleId=null;save();
+  toast("Статья отправлена на модерацию","g");go("myarticles");}
+ else{if(a.status==="rejected")a.status="draft";save();
+  toast("Черновик сохранён в «Мои статьи»","g",{label:"Открыть список",fn:()=>go("myarticles")});renderEditor();}}
+
+function renderQuestions(){const u=me();
+ const list=S.data.questions.filter(q=>(artById(q.articleId)||{}).author===u.name)
+  .sort((a,b)=>{const fa=(artById(a.articleId)||{}).freshness,fb=(artById(b.articleId)||{}).freshness;
+   const rank=f=>f==="green"?1:0;return rank(fa)-rank(fb)});
+ $("#s-questions").innerHTML=`<div class="head"><div><h2>Вопросы</h2><div class="sub">Открытых: ${list.filter(q=>q.status==="open").length} · всего ${list.length}</div></div></div>`+
+ (list.map(q=>{const a=artById(q.articleId);return `<div class="card m6">
+  <div class="row" style="justify-content:space-between"><h3 style="font-size:15px">${esc(a.title)}</h3>${statusTag(q.status)}</div>
+  <p class="muted mt-s">${freshBadge(a.freshness)} · вопрос от ${esc(q.author)}${a.freshness!=="green"?' · <b style="color:var(--amber)">требует актуализации</b>':""}</p>
+  <div class="comment mt"><b>${esc(q.author)}</b><p>${esc(q.text)}</p>${q.edited?'<span class="muted" style="font-size:11px">вопрос изменён автором</span>':""}${q.answer?`<div class="ans"><b>Ваш ответ:</b> ${esc(q.answer)}</div>`:""}</div>
+  <div class="row mt"><button class="btn btn-s btn-p" data-act="open-question" data-id="${q.id}">Открыть вопрос</button>
+   <button class="btn btn-s ${q.answer?"":"btn-g"}" data-act="answer" data-id="${q.id}">${q.answer?"Редактировать ответ":"Ответить"}</button>
+   <button class="btn btn-s" data-act="edit-question" data-id="${q.id}">Править вопрос</button>
+   ${freshBtn(a)}</div></div>`}).join("")
+  ||`<div class="card empty m12">Вопросов к вашим статьям пока нет.</div>`);}
+
+function questionDrawer(id){const q=qById(id);if(!q)return;const a=artById(q.articleId);const u=me();
+ const isAuthor=q.authorId===u.id||q.author===u.name;const isOwner=a&&a.author===u.name;
+ openDrawer(`<div class="drawer-h"><div><h3>Вопрос к статье</h3><div class="row mt-s">${statusTag(q.status)}${a?freshBadge(a.freshness):""}</div></div><button class="x" data-act="drawer-close">✕</button></div>
+ <p class="muted" style="font-size:13px">${esc(a?a.title:"Статья удалена")}</p>
+ <div class="sep"></div>
+ <div class="comment"><div class="row" style="justify-content:space-between"><b>${esc(q.author)}</b>${q.edited?'<span class="muted" style="font-size:11px">изменено</span>':""}</div><p>${esc(q.text)}</p></div>
+ ${isAuthor?`<div class="field"><label>Текст вопроса (можно править)</label><textarea id="dq-text">${esc(q.text)}</textarea></div><button class="btn btn-s" data-act="save-question" data-id="${q.id}">Сохранить вопрос</button>`:""}
+ ${isOwner?`<div class="sep"></div><div class="field"><label>${q.answer?"Ваш ответ (можно править)":"Ваш ответ"}</label><textarea id="dq-answer" placeholder="Опишите решение…">${esc(q.answer||"")}</textarea></div>
+  <div class="row"><button class="btn btn-g" data-act="answer-send" data-id="${q.id}">${q.answer?"Сохранить ответ":"Отправить ответ"}</button>${q.answer?`<button class="btn btn-s btn-a" data-act="reopen-question" data-id="${q.id}">Вернуть в открытые</button>`:""}</div>`
+  :q.answer?`<div class="ans mt"><b>Ответ автора:</b> ${esc(q.answer)}</div>`:`<p class="muted mt">Ожидает ответа автора статьи.</p>`}
+ ${isOwner&&a?`<div class="sep"></div><h3 style="font-size:15px">Актуальность статьи</h3>
+  <p class="muted mt-s" style="font-size:12px">Текущий статус: ${freshBadge(a.freshness)}. Кнопка переключает состояние в обе стороны.</p>
+  <div class="row mt">${freshBtn(a)}<button class="btn btn-s" data-act="open-article" data-id="${a.id}">Открыть статью</button></div>`:""}
+ <div class="sep"></div><button class="btn" data-act="drawer-close">Закрыть</button>`);}
+
+function renderModeration(){const list=S.data.articles.filter(a=>a.status==="moderation");
+ $("#s-moderation").innerHTML=`<div class="head"><div><h2>Модерация</h2><div class="sub">На модерации: ${list.length}</div></div></div>`+
+ (list.map(a=>`<div class="card m12"><div class="row" style="justify-content:space-between"><h3 style="font-size:16px">${esc(a.title)}</h3>${statusTag(a.status)}</div>
+  <p class="muted">Автор: ${esc(a.author)} · отправлено ${a.updated}</p>
+  <div class="kv"><span>Примеры кода</span><b style="color:${a.snippet?"var(--green)":"var(--red)"}">${a.snippet?"Есть":"Нет"}</b><span>Корректность тегов</span><b style="color:${a.tags.length?"var(--green)":"var(--red)"}">${a.tags.length?"Есть":"Нет"}</b><span>Привязка к репозиторию</span><b style="color:${a.repo.length?"var(--green)":"var(--red)"}">${a.repo.length?a.repo.join(", "):"Нет"}</b><span>Интерактивное задание</span><b style="color:${a.task?"var(--green)":"var(--muted)"}">${a.task?"Есть":"Нет"}</b></div>
+  <div class="row mt"><button class="btn btn-s" data-act="preview-article" data-id="${a.id}">Прочитать</button><button class="btn btn-s" data-act="open-article" data-id="${a.id}">Открыть</button><button class="btn btn-s btn-g" data-act="publish" data-id="${a.id}">Опубликовать</button><button class="btn btn-s btn-r" data-act="reject-art" data-id="${a.id}">Отклонить</button></div></div>`).join("")
+  ||`<div class="card empty m12">Статей на модерации нет.</div>`);}
+
+function renderAnalytics(){const pub=S.data.articles.filter(a=>a.status==="published");
+ const avg=Math.round(S.data.team.reduce((s,t)=>s+t.progress,0)/S.data.team.length);
+ const freshPct=pub.length?Math.round(pub.filter(a=>a.freshness==="green").length/pub.length*100):0;
+ $("#s-analytics").innerHTML=`<div class="head"><div><h2>Аналитика</h2><div class="sub">Прогресс онбординга и активность команды</div></div><button class="btn btn-p" data-act="report">Сформировать отчёт</button></div>
+ <div class="card stat m4"><div class="ico">📈</div><span>Средний прогресс</span><b>${avg}%</b><div class="bar-track"><i style="width:${avg}%"></i></div></div>
+ <div class="card stat m4"><div class="ico">📚</div><span>Опубликовано статей</span><b>${pub.length}</b><span>${freshPct}% актуальны</span></div>
+ <div class="card stat m4"><div class="ico">👥</div><span>Сотрудников</span><b>${S.data.team.length}</b><span>${S.data.team.filter(t=>t.mentor).length} с наставником</span></div>
+ <div class="card m12"><h3 style="font-size:15px">Прогресс онбординга сотрудников</h3>${S.data.team.map(t=>`<div class="step mt"><div class="step-n">${esc(t.name.split(" ").pop()[0])}</div><div class="step-b"><b>${esc(t.name)}</b><p>${ROLES[t.role]} · ${t.mentor?"наставник: "+esc(t.mentor):"наставник не назначен"}</p><div class="bar-track"><i style="width:${t.progress}%"></i></div></div><div class="row"><span class="tag b">${t.progress}%</span>${t.role==="junior"?`<button class="btn btn-s btn-p" data-act="assign-mentor" data-id="${t.id}">${t.mentor?"Сменить":"Назначить"} наставника</button>`:""}</div></div>`).join("")}</div>`;}
+
+function renderTeam(){$("#s-team").innerHTML=`<div class="head"><div><h2>Команда</h2><div class="sub">Права доступа и наставничество</div></div></div>
+ <div class="card m12 tbl-wrap"><table><thead><tr><th>Сотрудник</th><th>Роль</th><th>Прогресс</th><th>Наставник</th><th>Действия</th></tr></thead><tbody>${S.data.team.map(t=>`<tr><td>${esc(t.name)}</td><td>${ROLES[t.role]}</td><td><div class="bar-track" style="min-width:110px"><i style="width:${t.progress}%"></i></div><span class="muted">${t.progress}%</span></td><td>${t.mentor?esc(t.mentor):'<span class="muted">—</span>'}</td><td>${t.role==="junior"?`<button class="btn btn-s btn-p" data-act="assign-mentor" data-id="${t.id}">${t.mentor?"Сменить":"Назначить"}</button>`:'<span class="muted">—</span>'}</td></tr>`).join("")}</tbody></table></div>`;}
+
+function renderScenarios(){
+ $("#s-scenarios").innerHTML=`<div class="head"><div><h2>Тестовые сценарии</h2><div class="sub">Автоматическое отслеживание по журналу действий</div></div></div>`+
+ SCENARIOS.map(sc=>{const p=liveProgress(sc),done=p===sc.steps.length,ms=S.completed[S.sessionId+":"+sc.id],can=me().role===sc.role;
+  return `<div class="card scen m6"><div class="row" style="justify-content:space-between"><h3 style="font-size:15px">Сценарий ${sc.id}. ${esc(sc.name)}</h3><span class="tag ${can?"b":""}">${ROLES[sc.role]}</span></div>
+  <div class="steps">${sc.steps.map((st,i)=>`<div class="st ${i<p?"hit":""}"><i>${i<p?"✓":i+1}</i>${esc(st.l)}</div>`).join("")}</div>
+  <p class="muted" style="font-size:12px">${esc(sc.hint)}</p>
+  <div class="nums"><span>Норматив: <b>${sc.theory} с</b></span><span>Факт: <b>${ms?(ms/1000).toFixed(2)+" с":"—"}</b></span><span>${done?'<span class="tag g">Выполнен</span>':p>0?'<span class="tag a">В процессе</span>':'<span class="tag">Не начат</span>'}</span></div>
+  <details><summary>Разбивка норматива</summary><table><tbody>${sc.goms.map(([l,o])=>`<tr><td>${esc(l)}</td><td class="mono">${gsum(o).toFixed(2)} с</td></tr>`).join("")}</tbody></table></details>
+  ${can?`<button class="btn btn-p btn-s mt" data-act="scen-start" data-id="${sc.id}">${done?"Пройти заново":"Начать сценарий"}</button>`:""}</div>`}).join("");}
+
+function renderJournal(){const sessions={};S.log.forEach(e=>{const s=e.context.correlation_id;(sessions[s]=sessions[s]||[]).push(e)});
+ const rows=[];Object.entries(sessions).forEach(([sid,ev])=>SCENARIOS.forEach(sc=>completions(ev,sc).forEach(c=>rows.push({sc,sid,actor:c.first.actor_id,ms:c.ms}))));
+ $("#s-journal").innerHTML=`<div class="head"><div><h2>Журнал действий</h2><div class="sub">Аудит операций и хронометраж сценариев</div></div><div class="row"><button class="btn btn-s" data-act="export" data-id="csv">CSV</button><button class="btn btn-s" data-act="export" data-id="jsonl">JSONL</button><button class="btn btn-s" data-act="export" data-id="txt">TXT</button><button class="btn btn-s btn-r" data-act="journal-clear">Очистить</button><button class="btn btn-s" data-act="reset-demo">Сброс демо</button></div></div>
+ <div class="card stat m4"><div class="ico">🧾</div><b>${S.log.length}</b><span>Записей в журнале</span></div>
+ <div class="card stat m4"><div class="ico">🖥️</div><b>${Object.keys(sessions).length}</b><span>Сеансов работы</span></div>
+ <div class="card stat m4"><div class="ico">✅</div><b>${rows.length}</b><span>Завершённых сценариев</span></div>
+ <div class="card m12 tbl-wrap"><h3 style="font-size:15px">Время выполнения сценариев</h3><table class="mt"><thead><tr><th>Сценарий</th><th>Сеанс</th><th>Пользователь</th><th>Факт</th><th>Норматив</th><th>Δ</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${r.sc.id}.</b> ${esc(r.sc.name)}</td><td class="mono">${esc(r.sid)}</td><td>${esc(actorName(r.actor))}</td><td class="mono" style="color:var(--cyan)">${(r.ms/1000).toFixed(2)} с</td><td class="mono">${r.sc.theory} с</td><td class="mono" style="color:${r.ms/1000>r.sc.theory?"var(--amber)":"var(--green)"}">${(r.ms/1000-r.sc.theory).toFixed(2)} с</td></tr>`).join("")||`<tr><td colspan="6" class="empty">Завершённых сценариев пока нет.</td></tr>`}</tbody></table></div>
+ <div class="card m12 tbl-wrap"><h3 style="font-size:15px">Последние события</h3><table class="mt"><thead><tr><th>Время</th><th>Пользователь</th><th>Роль</th><th>Действие</th><th>Объект</th><th>Результат</th></tr></thead><tbody>${S.log.slice(-120).reverse().map(e=>`<tr><td class="mono">${e.timestamp.slice(11,23)}</td><td>${esc(actorName(e.actor_id))}</td><td>${esc(ROLES[e.actor_role]||e.actor_role)}</td><td class="mono" style="color:var(--blue)">${esc(e.action)}</td><td class="mono">${esc(e.object_type)}:${esc(e.object_id)}</td><td>${e.outcome==="success"?'<span class="tag g">Успешно</span>':'<span class="tag r">Ошибка</span>'}</td></tr>`).join("")||`<tr><td colspan="6" class="empty">Журнал пуст</td></tr>`}</tbody></table></div>`;}
+
+function renderProfile(){const u=me();const mine=S.log.filter(e=>e.actor_id===u.id);const t=S.data.team.find(x=>x.id===u.id);
+ const extra=u.role==="junior"?`<p class="muted mt">Прогресс онбординга: <b style="color:var(--cyan)">${progress()}%</b></p><div class="bar-track mt-s"><i style="width:${progress()}%"></i></div><p class="muted mt">Наставник: ${t&&t.mentor?esc(t.mentor):"не назначен"}</p>`
+  :u.role==="senior"?`<p class="muted mt">Статей: <b>${S.data.articles.filter(a=>a.author===u.name).length}</b> · черновиков: <b>${S.data.articles.filter(a=>a.author===u.name&&a.status==="draft").length}</b></p>`
+  :`<p class="muted mt">Статей на модерации: <b>${S.data.articles.filter(a=>a.status==="moderation").length}</b></p>`;
+ $("#s-profile").innerHTML=`<div class="head"><div><h2>Профиль</h2><div class="sub">Учётная запись и активность</div></div></div>
+ <div class="card m6"><h3 style="font-size:16px">${esc(u.name)}</h3><p class="muted">Роль: ${ROLES[u.role]}</p><p class="muted">Учётная запись: <span class="mono">${u.login}</span> · <span class="mono">${u.id}</span></p>${extra}<div class="row mt"><button class="btn" data-act="logout">Выйти из системы</button></div></div>
+ <div class="card m6"><h3 style="font-size:16px">История действий</h3>${mine.slice(-9).reverse().map(e=>`<p class="muted" style="padding:8px 0;border-bottom:1px dashed var(--line)"><span class="mono">${e.timestamp.slice(11,19)}</span> · ${esc(e.action)}</p>`).join("")||'<p class="muted">Действий пока нет</p>'}</div>`;}
+
+/* ---------- export ---------- */
+const csvCell=v=>'"'+String(typeof v==="string"?v:JSON.stringify(v??{})).replace(/"/g,'""')+'"';
+const toCSV=()=>"timestamp,actor_id,actor_role,action,object_type,object_id,outcome,changes,context\n"+S.log.map(e=>[e.timestamp,e.actor_id,e.actor_role,e.action,e.object_type,e.object_id,e.outcome,csvCell(e.changes),csvCell(e.context)].join(",")).join("\n");
+const toJSONL=()=>S.log.map(e=>JSON.stringify({timestamp:e.timestamp,actor:{id:e.actor_id,role:e.actor_role},action:e.action,object:{type:e.object_type,id:e.object_id},outcome:e.outcome,changes:e.changes,context:e.context})).join("\n");
+const toTXT=()=>S.log.map(e=>`${e.timestamp} actor=${e.actor_id} role=${e.actor_role} action=${e.action} object=${e.object_type}:${e.object_id} outcome=${e.outcome} corr=${e.context.correlation_id}`).join("\n");
+function download(name,text){const b=new Blob([text],{type:"text/plain;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1200)}
+
+/* ---------- auth ---------- */
+function render(){const u=me();if(!u){$("#s-login").hidden=false;$("#shell").hidden=true;closeDrawer();return}
+ $("#s-login").hidden=true;$("#shell").hidden=false;$("#who-name").textContent=u.name;$("#who-role").textContent=ROLES[u.role];
+ go(S.screen&&SCREENS[u.role].includes(S.screen)?S.screen:MENU[u.role][0][0]);}
+$("#accts").innerHTML=ACCOUNTS.map(a=>`<div class="acct" data-login="${a.login}" data-pass="${a.password}"><span><b>${esc(a.name)}</b><br><span class="mono">${ROLES[a.role]}</span></span><span class="mono">${a.login} / ${a.password}</span></div>`).join("");
+$("#accts").addEventListener("click",e=>{const el=e.target.closest(".acct");if(!el)return;const f=$("#f-login");f.login.value=el.dataset.login;f.password.value=el.dataset.pass});
+$("#f-login").addEventListener("submit",e=>{e.preventDefault();const fd=new FormData(e.target);
+ const acc=ACCOUNTS.find(a=>a.login===String(fd.get("login")).trim()&&a.password===String(fd.get("password")));
+ if(!acc){$("#login-err").hidden=false;$("#login-err").textContent="Неверный логин или пароль";return}
+ $("#login-err").hidden=true;e.target.reset();
+ S.session=acc.id;S.sessionId=uid("sess");S.screen=MENU[acc.role][0][0];S.articleId=null;S.editArticleId=null;S.editorMode="create";S.kbFilters={};S.sandboxPassed={};S.sel=[];
+ logEvent("login","account",acc.id,"success",{role:acc.role});render();toast("Вы вошли как "+acc.name,"g")});
+
+/* ---------- actions ---------- */
+function refreshAfterArticleChange(a){
+ if(S.screen==="questions")renderQuestions();
+ if(S.screen==="article")renderArticle();
+ if(S.screen==="myarticles")renderMyArticles();
+ if(S.screen==="moderation")renderModeration();
+ if(S.screen==="overview")renderOverview();
+ if(!$("#drawer").hidden&&$("#drawer").dataset.q)questionDrawer($("#drawer").dataset.q);}
+
+document.addEventListener("click",e=>{
+ if(e.target.id==="scrim"){closeDrawer();return}
+ if(e.target.id==="modal"){closeModal();return}
+ const el=e.target.closest("[data-act]");if(!el||el.disabled)return;
+ const act=el.dataset.act,id=el.dataset.id;
+
+ if(act==="pick"){e.stopPropagation();const i=S.sel.indexOf(id);if(i<0)S.sel.push(id);else S.sel.splice(i,1);save();renderMyArticles();return}
+ if(act==="bulk-clear"){S.sel=[];save();renderMyArticles();return}
+ if(act==="bulk-send"){const ids=[...S.sel];let n=0;ids.forEach(x=>{const a=artById(x);if(a&&(a.status==="draft"||a.status==="rejected")){a.status="moderation";logEvent("send_moderation","article",x);n++}});
+  S.sel=[];save();renderMyArticles();toast(n?`Отправлено на модерацию: ${n}`:"Среди выбранных нет черновиков",n?"g":"a");return}
+ if(act==="bulk-delete"){const ids=[...S.sel];if(!ids.length)return;
+  openModal(`<h3>Удалить выбранные статьи?</h3><p class="muted">Будет удалено записей: ${ids.length}. Действие можно отменить сразу после удаления.</p><div class="row mt"><button class="btn btn-r" data-act="bulk-delete-confirm">Удалить</button><button class="btn" data-act="modal-close">Отмена</button></div>`);return}
+ if(act==="bulk-delete-confirm"){const ids=[...S.sel];const backup=ids.map(x=>({i:S.data.articles.findIndex(a=>a.id===x),a:artById(x)})).filter(x=>x.a);
+  S.data.articles=S.data.articles.filter(a=>!ids.includes(a.id));ids.forEach(x=>logEvent("delete_article","article",x));
+  S.sel=[];save();closeModal();renderMyArticles();
+  toast(`Удалено статей: ${backup.length}`,"a",{label:"Отменить",fn:()=>{backup.sort((p,q)=>p.i-q.i).forEach(({i,a})=>S.data.articles.splice(Math.min(i,S.data.articles.length),0,a));logEvent("restore_articles","article","bulk");save();renderMyArticles();toast("Статьи восстановлены","g")}});return}
+
+ if(act==="go"){go(id);return}
+ if(act==="drawer-close"){closeDrawer();return}
+ if(act==="modal-close"){closeModal();return}
+ if(act==="logout"){logEvent("logout","account",S.session);S.session=null;S.sessionId=null;S.screen=null;S.sel=[];save();closeModal();closeDrawer();render();return}
+ if(act==="open-article"){S.articleId=id;save();go("article");return}
+ if(act==="preview-article"){e.stopPropagation();previewDrawer(id);return}
+ if(act==="scen-start"){const sc=SCENARIOS.find(x=>x.id===+id);if(!sc)return;
+  if(sc.role==="senior"&&sc.entry==="editor"){S.editorMode="create";S.editArticleId=null}
+  if(sc.role==="junior"){const cur=S.data.checklist.find(s=>!s.done&&s.articleId);if(cur)S.articleId=cur.articleId}
+  go(sc.entry);return}
+
+ if(act==="kb-saveview"){const name=prompt("Название сохранённого вида:");if(name&&name.trim()){S.data.views.push({name:name.trim(),f:{...S.kbFilters}});save();renderKB();toast("Вид сохранён","g")}return}
+ if(act==="kb-delview"){const i=+$("#kb-views").value;if(isNaN(i)||!S.data.views[i]){toast("Выберите сохранённый вид","a");return}const n=S.data.views[i].name;S.data.views.splice(i,1);save();renderKB();toast("Вид удалён: "+n,"a");return}
+
+ if(act==="complete-step"){if(completeStep(id))renderOnboarding();return}
+ if(act==="complete-step-article"){const a=artById(S.articleId);if(a&&completeStep(id)){const w=$("#step-card");if(w)w.outerHTML=stepCardHTML(a)}return}
+ if(act==="run-sandbox"){const a=artById(id);if(!a||!a.task)return;
+  const cmd=($("#sandbox-cmd").value||"").trim(),out=$("#sandbox-out"),hint=$("#sandbox-hint");
+  if(cmd===a.task.command){out.className="sandbox-out ok";out.textContent=`$ ${cmd}\nDocker version 24.0.6, build ed223bc\n✓ Команда выполнена успешно.`;hint.hidden=true;S.sandboxPassed[id]=true;
+   logEvent("run_sandbox","sandbox",id,"success",{command:cmd});toast("Задание выполнено — отметьте шаг прямо здесь","g")}
+  else{out.className="sandbox-out err";out.textContent=`$ ${cmd||"(пусто)"}\n✗ Результат не соответствует ожидаемому.`;hint.hidden=false;hint.textContent="💡 Подсказка: "+a.task.hint;S.sandboxPassed[id]=false;
+   logEvent("run_sandbox","sandbox",id,"failure",{command:cmd});toast("Ошибка выполнения. Прочитайте подсказку","r")}
+  save();const w=$("#step-card");if(w)w.outerHTML=stepCardHTML(a);return}
+ if(act==="rate"){const a=artById(id);a.rating=Math.min(5,+((a.rating||0)+0.1).toFixed(1));logEvent("rate_article","article",id,"success",{rating:a.rating});save();renderArticle();toast("Спасибо за оценку!","g");return}
+
+ if(act==="ask"){const a=artById(id);openModal(`<h3>Задать вопрос к статье</h3><p class="muted">${esc(a.title)}</p><div class="field mt"><label>Ваш вопрос</label><textarea id="ask-text" placeholder="Опишите, что осталось непонятным…"></textarea></div><div class="row"><button class="btn btn-p" data-act="ask-send" data-id="${id}">Отправить</button><button class="btn" data-act="modal-close">Отмена</button></div>`);return}
+ if(act==="ask-send"){const t=($("#ask-text").value||"").trim();if(!t){toast("Введите текст вопроса","r");return}
+  const u=me();const q={id:uid("q"),articleId:id,author:u.name,authorId:u.id,text:t,status:"open",answer:null,edited:false};
+  S.data.questions.push(q);logEvent("ask_question","question",q.id,"success",{article_id:id});save();closeModal();renderArticle();toast("Вопрос отправлен автору","g");return}
+
+ if(act==="art-new"){S.editorMode="create";S.editArticleId=null;save();go("editor");return}
+ if(act==="art-edit"){S.editorMode="edit";S.editArticleId=id;save();go("editor");return}
+ if(act==="art-save"){persistArticle(false);return}
+ if(act==="art-send"){persistArticle(true);return}
+ if(act==="art-send-existing"){const a=artById(id);if(!a)return;a.status="moderation";a.updated=today();
+  logEvent("send_moderation","article",id);S.flash=id;save();closeDrawer();
+  if(S.screen==="myarticles")renderMyArticles();else go("myarticles");toast("Статья отправлена на модерацию","g");return}
+ if(act==="add-task"){const b=$("#task-block");if(b){b.hidden=false;const i=$("#ed-taskcmd");if(i)i.focus()}logEvent("add_task","article",S.editArticleId||"new");save();toast("Блок задания добавлен","g");return}
+ if(act==="art-delete"){const a=artById(id);if(!a)return;openModal(`<h3>Удаление статьи</h3><p class="muted">«${esc(a.title)}» будет удалена. Сразу после удаления действие можно отменить.</p><div class="row mt"><button class="btn btn-r" data-act="art-delete-confirm" data-id="${id}">Удалить</button><button class="btn" data-act="modal-close">Отмена</button></div>`);return}
+ if(act==="art-delete-confirm"){const i=S.data.articles.findIndex(a=>a.id===id);if(i<0)return;const [a]=S.data.articles.splice(i,1);
+  S.sel=S.sel.filter(x=>x!==id);if(S.editArticleId===id){S.editArticleId=null;S.editorMode="create"}
+  logEvent("delete_article","article",id);save();closeModal();closeDrawer();
+  if(S.screen==="editor")go("myarticles");else renderMyArticles();
+  toast("Статья удалена","a",{label:"Отменить",fn:()=>{S.data.articles.splice(Math.min(i,S.data.articles.length),0,a);logEvent("restore_article","article",id);save();if(S.screen==="myarticles")renderMyArticles();toast("Статья восстановлена","g")}});return}
+
+ if(act==="open-question"){const q=qById(id);if(!q)return;logEvent("open_question","question",id);save();
+  $("#drawer").dataset.q=id;questionDrawer(id);return}
+ if(act==="edit-question"){const q=qById(id);if(!q)return;logEvent("open_question","question",id);save();$("#drawer").dataset.q=id;questionDrawer(id);
+  setTimeout(()=>{const t=$("#dq-text");if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length)}},60);return}
+ if(act==="save-question"){const q=qById(id);const t=($("#dq-text")?.value||"").trim();if(!t){toast("Вопрос не может быть пустым","r");return}
+  q.text=t;q.edited=true;logEvent("edit_question","question",id,"success",{article_id:q.articleId});save();questionDrawer(id);
+  if(S.screen==="questions")renderQuestions();if(S.screen==="article")renderArticle();toast("Вопрос обновлён","g");return}
+ if(act==="answer"){const q=qById(id);if(!q)return;$("#drawer").dataset.q=id;questionDrawer(id);
+  setTimeout(()=>{const t=$("#dq-answer");if(t)t.focus()},60);return}
+ if(act==="answer-send"){const q=qById(id);const t=($("#dq-answer")?.value||"").trim();if(!t){toast("Введите текст ответа","r");return}
+  const first=!q.answer;q.answer=t;q.status="answered";
+  logEvent(first?"answer_question":"edit_answer","question",id,"success",{article_id:q.articleId});save();
+  $("#drawer").dataset.q=id;questionDrawer(id);if(S.screen==="questions")renderQuestions();if(S.screen==="article")renderArticle();
+  toast(first?"Ответ отправлен":"Ответ обновлён","g");return}
+ if(act==="reopen-question"){const q=qById(id);q.status="open";logEvent("reopen_question","question",id);save();questionDrawer(id);
+  if(S.screen==="questions")renderQuestions();toast("Вопрос возвращён в открытые","a");return}
+
+ if(act==="toggle-fresh"){const a=artById(id);if(!a)return;
+  if(a.freshness==="green"){a.freshness="red";logEvent("mark_outdated","article",id,"success",{freshness:"red"});toast("Статья помечена как неактуальная","a")}
+  else{a.freshness="green";a.updated=today();logEvent("update_article","article",id,"success",{freshness:"green"});toast("Статья актуализирована — индикатор зелёный","g")}
+  save();refreshAfterArticleChange(a);
+  const qid=$("#drawer").dataset.q;if(!$("#drawer").hidden&&qid&&qById(qid))questionDrawer(qid);
+  return}
+
+ if(act==="publish"){const a=artById(id);logEvent("check_standards","article",id,"success",{snippet:!!a.snippet,tags:a.tags.length,repo:a.repo.length});
+  a.status="published";logEvent("publish_article","article",id);save();renderModeration();toast("Статья опубликована","g");return}
+ if(act==="reject-art"){const a=artById(id);a.status="rejected";logEvent("reject_article","article",id);save();renderModeration();toast("Статья отклонена и возвращена автору","a");return}
+ if(act==="assign-mentor"){const t=S.data.team.find(x=>x.id===id);const seniors=S.data.team.filter(x=>x.role!=="junior");
+  openModal(`<h3>Назначение наставника</h3><p class="muted">${esc(t.name)} · прогресс ${t.progress}%</p><div class="field mt"><label>Наставник</label><select id="mentor-sel">${seniors.map(s=>`<option value="${esc(s.name)}" ${t.mentor===s.name?"selected":""}>${esc(s.name)} · ${ROLES[s.role]}</option>`).join("")}</select></div><div class="row"><button class="btn btn-p" data-act="assign-mentor-confirm" data-id="${id}">Назначить</button><button class="btn" data-act="modal-close">Отмена</button></div>`);return}
+ if(act==="assign-mentor-confirm"){const t=S.data.team.find(x=>x.id===id);t.mentor=$("#mentor-sel").value;
+  logEvent("assign_mentor","team",id,"success",{mentor:t.mentor});save();closeModal();
+  if(S.screen==="analytics")renderAnalytics();else if(S.screen==="team")renderTeam();toast("Наставник назначен: "+t.mentor,"g");return}
+ if(act==="report"){logEvent("generate_report","report",uid("rep"));save();toast("Отчёт по онбордингу сформирован","g");return}
+ if(act==="export"){const c=id==="csv"?toCSV():id==="jsonl"?toJSONL():toTXT();download("devdocs_log."+id,c);
+  logEvent("export_log","log",id,"success",{format:id,records:S.log.length});renderJournal();toast("Журнал выгружен: "+id.toUpperCase(),"g");return}
+ if(act==="journal-clear"){S.log=[];S.completed={};save();renderJournal();updateNavPill();toast("Журнал очищен","a");return}
+ if(act==="reset-demo"){openModal(`<h3>Сброс демо-данных</h3><p class="muted">Статьи, черновики, чеклист, вопросы и журнал вернутся к исходному состоянию.</p><div class="row mt"><button class="btn btn-r" data-act="reset-demo-confirm">Сбросить</button><button class="btn" data-act="modal-close">Отмена</button></div>`);return}
+ if(act==="reset-demo-confirm"){S.data=seedData();S.log=[];S.completed={};S.sandboxPassed={};S.sel=[];S.articleId=null;S.editArticleId=null;S.editorMode="create";S.kbFilters={};
+  reflowSteps();save();closeModal();closeDrawer();go(S.screen);toast("Демо-данные сброшены","g");return}
+});
+
+document.addEventListener("change",e=>{
+ if(e.target.classList.contains("ed-repo"))logEvent("link_repo","article",S.editArticleId||"new","success",{file:e.target.value,checked:e.target.checked});
+});
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"){if(!$("#modal").hidden)closeModal();else if(!$("#drawer").hidden)closeDrawer()}
+ if((e.ctrlKey||e.metaKey)&&e.key==="Enter"&&$("#sandbox-cmd")&&document.activeElement===$("#sandbox-cmd")){const b=document.querySelector('[data-act="run-sandbox"]');if(b)b.click()}
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"&&S.screen==="editor"){e.preventDefault();persistArticle(false)}
+});
+render();
+</script>
+</body>
+</html>
